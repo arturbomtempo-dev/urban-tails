@@ -1,7 +1,7 @@
 const express = require('express');
 const animaisRoutes = require('./routes/animaisRoutes');
 const consultasRoutes = require('./routes/consultasRoutes');
-const errorHandler = require('./utils/errorHandler');
+const { errorHandler } = require('./utils/errorHandler');
 const setupSwagger = require('./docs/swagger');
 
 const app = express();

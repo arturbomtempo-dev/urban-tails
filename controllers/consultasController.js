@@ -1,21 +1,14 @@
 const repository = require('../repositories/consultasRepository');
 const animaisRepository = require('../repositories/animaisRepository');
 const { consultaSchema } = require('../utils/consultaValidation');
-
-class ApiError extends Error {
-    constructor(message, statusCode = 500) {
-        super(message);
-        this.name = 'ApiError';
-        this.statusCode = statusCode;
-    }
-}
+const { AppError } = require('../utils/errorHandler');
 
 const getConsultas = (req, res, next) => {
     try {
         const consultas = repository.findAll();
         res.status(200).json(consultas);
     } catch {
-        throw new ApiError('Erro ao listar consultas.');
+        throw new AppError(500, 'Erro ao listar consultas.');
     }
 };
 
@@ -25,14 +18,14 @@ const createConsulta = (req, res, next) => {
         const animalExiste = animaisRepository.findById(data.animalId);
 
         if (!animalExiste) {
-            throw new ApiError('Animal não encontrado para associar à consulta.', 404);
+            throw new AppError(404, 'Animal não encontrado para associar à consulta.');
         }
 
         const consulta = repository.create(data);
 
         res.status(201).json(consulta);
     } catch (error) {
-        throw new ApiError(error.message, 400);
+        throw new AppError(400, error.message);
     }
 };
 
@@ -44,18 +37,18 @@ const updateConsulta = (req, res, next) => {
         const animalExiste = animaisRepository.findById(data.animalId);
 
         if (!animalExiste) {
-            throw new ApiError('Animal não encontrado para associar à consulta.', 404);
+            throw new AppError(404, 'Animal não encontrado para associar à consulta.');
         }
 
         const updated = repository.update(id, data);
 
         if (!updated) {
-            throw new ApiError('Consulta não encontrada.', 404);
+            throw new AppError(404, 'Consulta não encontrada.');
         }
 
         res.status(200).json(updated);
     } catch (error) {
-        throw new ApiError(error.message, 400);
+        throw new AppError(400, error.message);
     }
 };
 
@@ -66,12 +59,12 @@ const deleteConsulta = (req, res, next) => {
         const deleted = repository.remove(id);
 
         if (!deleted) {
-            throw new ApiError('Consulta não encontrada.', 404);
+            throw new AppError(404, 'Consulta não encontrada.');
         }
 
         res.status(204).send();
     } catch {
-        throw new ApiError('Erro ao deletar consulta.');
+        throw new AppError(500, 'Erro ao deletar consulta.');
     }
 };
 
