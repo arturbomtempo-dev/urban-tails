@@ -1,0 +1,21 @@
+const express = require('express');
+const animaisRoutes = require('./routes/animaisRoutes');
+const consultasRoutes = require('./routes/consultasRoutes');
+const { errorHandler } = require('./utils/errorHandler');
+const setupSwagger = require('./docs/swagger');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
+
+app.use('/animais', animaisRoutes);
+app.use('/consultas', consultasRoutes);
+
+app.use(errorHandler);
+
+setupSwagger(app);
+
+app.listen(PORT, () => {
+    console.log(`Servidor do Petshop rodando em http://localhost:${PORT}`);
+});

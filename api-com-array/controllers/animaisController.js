@@ -31,7 +31,7 @@ const updateAnimal = (req, res, next) => {
         if (!updated) {
             throw new AppError(404, 'Animal não encontrado.');
         }
-        
+
         res.status(200).json(updated);
     } catch (error) {
         throw new AppError(400, error.message);
