@@ -1,6 +1,6 @@
-require('dotenv').config();
 const express = require('express');
 const animaisRoutes = require('./routes/animaisRoutes');
+const consultasRoutes = require('./routes/consultasRoutes');
 const errorHandler = require('./utils/errorHandler');
 const setupSwagger = require('./docs/swagger');
 
@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 app.use('/animais', animaisRoutes);
+app.use('/consultas', consultasRoutes);
 
 app.use(errorHandler);
 

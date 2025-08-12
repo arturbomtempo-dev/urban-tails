@@ -1,26 +1,28 @@
 {
-    "dependencies": {
-        "dotenv": "^17.2.0",
-        "express": "^5.1.0",
-        "swagger-jsdoc": "^6.2.8",
-        "swagger-ui-express": "^5.0.1",
-        "uuid": "^11.1.0",
-        "zod": "^4.0.5"
-    },
     "name": "urban-tails",
     "version": "1.0.0",
     "description": "",
     "main": "server.js",
+    "directories": {
+        "doc": "docs"
+    },
+    "dependencies": {
+        "express": "^5.1.0",
+        "swagger-jsdoc": "^6.2.8",
+        "swagger-ui-express": "^5.0.1",
+        "uuid": "^11.1.0",
+        "zod": "^4.0.17"
+    },
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node --watch server.js"
+        "start": "node --watch server.js",
+        "format": "prettier --write ."
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/arturbomtempo-dev/urban-tails.git"
     },
     "keywords": [],
-    "author": "Artur Bomtempo Colen",
+    "author": "",
     "license": "ISC",
     "type": "commonjs",
     "bugs": {

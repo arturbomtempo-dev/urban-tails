@@ -13,8 +13,8 @@ const getAnimais = (req, res, next) => {
     try {
         const animais = repository.findAll();
         res.status(200).json(animais);
-    } catch (error) {
-        next(new ApiError('Erro ao listar animais.'));
+    } catch {
+        throw new ApiError('Erro ao listar animais.');
     }
 };
 
@@ -22,9 +22,10 @@ const createAnimal = (req, res, next) => {
     try {
         const data = animalSchema.parse(req.body);
         const animal = repository.create(data);
+
         res.status(201).json(animal);
     } catch (error) {
-        next(new ApiError(error.message, 400));
+        throw new ApiError(error.message, 400);
     }
 };
 
@@ -33,21 +34,30 @@ const updateAnimal = (req, res, next) => {
     try {
         const data = animalSchema.parse(req.body);
         const updated = repository.update(id, data);
-        if (!updated) return next(new ApiError('Animal não encontrado.', 404));
+
+        if (!updated) {
+            throw new ApiError('Animal não encontrado.', 404);
+        }
+        
         res.status(200).json(updated);
     } catch (error) {
-        next(new ApiError(error.message, 400));
+        throw new ApiError(error.message, 400);
     }
 };
 
 const deleteAnimal = (req, res, next) => {
     const { id } = req.params;
+
     try {
         const deleted = repository.remove(id);
-        if (!deleted) return next(new ApiError('Animal não encontrado.', 404));
+
+        if (!deleted) {
+            throw new ApiError('Animal não encontrado.', 404);
+        }
+        
         res.status(204).send();
-    } catch (error) {
-        next(new ApiError('Erro ao deletar animal.'));
+    } catch {
+        throw new ApiError('Erro ao deletar animal.');
     }
 };
 

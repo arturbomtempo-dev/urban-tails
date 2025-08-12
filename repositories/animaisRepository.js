@@ -14,19 +14,23 @@ const create = (data) => {
 
 const update = (id, data) => {
     const index = animais.findIndex((a) => a.id === id);
+
     if (index !== -1) {
         animais[index] = { ...animais[index], ...data };
         return animais[index];
     }
+
     return null;
 };
 
 const remove = (id) => {
     const index = animais.findIndex((a) => a.id === id);
+
     if (index !== -1) {
         animais.splice(index, 1);
         return true;
     }
+
     return false;
 };
 
