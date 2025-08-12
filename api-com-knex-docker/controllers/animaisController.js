@@ -2,56 +2,63 @@ const repository = require('../repositories/animaisRepository');
 const { animalSchema } = require('../utils/animalValidation');
 const { AppError } = require('../utils/errorHandler');
 
-const getAnimais = (req, res, next) => {
+const getAnimais = async (req, res, next) => {
     try {
-        const animais = repository.findAll();
+        const animais = await repository.findAll();
         res.status(200).json(animais);
-    } catch {
-        throw new AppError(500, 'Erro ao listar animais.');
+    } catch (error) {
+        next(error);
     }
 };
 
-const createAnimal = (req, res, next) => {
+const getAnimalById = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const animal = await repository.findById(id);
+        if (!animal) throw new AppError(404, 'Animal não encontrado');
+        res.status(200).json(animal);
+    } catch (error) {
+        next(error);
+    }
+};
+
+const createAnimal = async (req, res, next) => {
     try {
         const data = animalSchema.parse(req.body);
-        const animal = repository.create(data);
-
+        const animal = await repository.create(data);
         res.status(201).json(animal);
     } catch (error) {
-        throw new AppError(400, error.message);
+        next(error);
     }
 };
 
-const updateAnimal = (req, res, next) => {
-    const { id } = req.params;
+const updateAnimal = async (req, res, next) => {
     try {
-        const data = animalSchema.parse(req.body);
-        const updated = repository.update(id, data);
-
-        if (!updated) {
-            throw new AppError(404, 'Animal não encontrado.');
-        }
-
-        res.status(200).json(updated);
+        const { id } = req.params;
+        const data = animalSchema.partial().parse(req.body);
+        const animal = await repository.update(id, data);
+        if (!animal) throw new AppError(404, 'Animal não encontrado para atualizar');
+        res.status(200).json(animal);
     } catch (error) {
-        throw new AppError(400, error.message);
+        next(error);
     }
 };
 
-const deleteAnimal = (req, res, next) => {
-    const { id } = req.params;
-
+const deleteAnimal = async (req, res, next) => {
     try {
-        const deleted = repository.remove(id);
-
-        if (!deleted) {
-            throw new AppError(404, 'Animal não encontrado.');
-        }
-
+        const { id } = req.params;
+        const deleted = await repository.remove(id);
+        if (!deleted) throw new AppError(404, 'Animal não encontrado para deletar');
         res.status(204).send();
-    } catch {
-        throw new AppError(500, 'Erro ao deletar animal.');
+    } catch (error) {
+        next(error);
     }
 };
 
-module.exports = { getAnimais, createAnimal, updateAnimal, deleteAnimal };
+module.exports = {
+    getAnimais,
+    getAnimalById,
+    createAnimal,
+    updateAnimal,
+    deleteAnimal,
+};

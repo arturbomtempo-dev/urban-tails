@@ -1,37 +1,47 @@
-const { v4: uuidv4 } = require('uuid');
+const db = require('../db/db');
+const { AppError } = require('../utils/errorHandler');
 
-const consultas = [];
-
-const findAll = () => consultas;
-
-const findById = (id) => consultas.find((c) => c.id === id);
-
-const create = (data) => {
-    const novaConsulta = { id: uuidv4(), ...data };
-    consultas.push(novaConsulta);
-    return novaConsulta;
-};
-
-const update = (id, data) => {
-    const index = consultas.findIndex((c) => c.id === id);
-
-    if (index !== -1) {
-        consultas[index] = { ...consultas[index], ...data };
-        return consultas[index];
+async function findAll() {
+    try {
+        return await db('consultas').select('*').orderBy('id', 'asc');
+    } catch (error) {
+        throw new AppError(500, 'Erro ao buscar consultas', [error.message]);
     }
+}
 
-    return null;
-};
-
-const remove = (id) => {
-    const index = consultas.findIndex((c) => c.id === id);
-
-    if (index !== -1) {
-        consultas.splice(index, 1);
-        return true;
+async function findById(id) {
+    try {
+        return await db('consultas').where({ id }).first();
+    } catch (error) {
+        throw new AppError(500, 'Erro ao buscar consulta', [error.message]);
     }
+}
 
-    return false;
-};
+async function create(data) {
+    try {
+        const [consulta] = await db('consultas').insert(data).returning('*');
+        return consulta;
+    } catch (error) {
+        throw new AppError(500, 'Erro ao criar consulta', [error.message]);
+    }
+}
+
+async function update(id, data) {
+    try {
+        const [consulta] = await db('consultas').update(data).where({ id }).returning('*');
+        return consulta || null;
+    } catch (error) {
+        throw new AppError(500, 'Erro ao atualizar consulta', [error.message]);
+    }
+}
+
+async function remove(id) {
+    try {
+        const deleted = await db('consultas').where({ id }).del();
+        return deleted > 0;
+    } catch (error) {
+        throw new AppError(500, 'Erro ao deletar consulta', [error.message]);
+    }
+}
 
 module.exports = { findAll, findById, create, update, remove };

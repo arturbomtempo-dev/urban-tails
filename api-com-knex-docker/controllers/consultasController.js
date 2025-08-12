@@ -1,71 +1,64 @@
 const repository = require('../repositories/consultasRepository');
-const animaisRepository = require('../repositories/animaisRepository');
 const { consultaSchema } = require('../utils/consultaValidation');
 const { AppError } = require('../utils/errorHandler');
 
-const getConsultas = (req, res, next) => {
+const getConsultas = async (req, res, next) => {
     try {
-        const consultas = repository.findAll();
+        const consultas = await repository.findAll();
         res.status(200).json(consultas);
-    } catch {
-        throw new AppError(500, 'Erro ao listar consultas.');
+    } catch (error) {
+        next(error);
     }
 };
 
-const createConsulta = (req, res, next) => {
+const getConsultaById = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const consulta = await repository.findById(id);
+        if (!consulta) throw new AppError(404, 'Consulta não encontrada');
+        res.status(200).json(consulta);
+    } catch (error) {
+        next(error);
+    }
+};
+
+const createConsulta = async (req, res, next) => {
     try {
         const data = consultaSchema.parse(req.body);
-        const animalExiste = animaisRepository.findById(data.animalId);
-
-        if (!animalExiste) {
-            throw new AppError(404, 'Animal não encontrado para associar à consulta.');
-        }
-
-        const consulta = repository.create(data);
-
+        const consulta = await repository.create(data);
         res.status(201).json(consulta);
     } catch (error) {
-        throw new AppError(400, error.message);
+        next(error);
     }
 };
 
-const updateConsulta = (req, res, next) => {
-    const { id } = req.params;
-
+const updateConsulta = async (req, res, next) => {
     try {
-        const data = consultaSchema.parse(req.body);
-        const animalExiste = animaisRepository.findById(data.animalId);
-
-        if (!animalExiste) {
-            throw new AppError(404, 'Animal não encontrado para associar à consulta.');
-        }
-
-        const updated = repository.update(id, data);
-
-        if (!updated) {
-            throw new AppError(404, 'Consulta não encontrada.');
-        }
-
-        res.status(200).json(updated);
+        const { id } = req.params;
+        const data = consultaSchema.partial().parse(req.body);
+        const consulta = await repository.update(id, data);
+        if (!consulta) throw new AppError(404, 'Consulta não encontrada para atualizar');
+        res.status(200).json(consulta);
     } catch (error) {
-        throw new AppError(400, error.message);
+        next(error);
     }
 };
 
-const deleteConsulta = (req, res, next) => {
-    const { id } = req.params;
-
+const deleteConsulta = async (req, res, next) => {
     try {
-        const deleted = repository.remove(id);
-
-        if (!deleted) {
-            throw new AppError(404, 'Consulta não encontrada.');
-        }
-
+        const { id } = req.params;
+        const deleted = await repository.remove(id);
+        if (!deleted) throw new AppError(404, 'Consulta não encontrada para deletar');
         res.status(204).send();
-    } catch {
-        throw new AppError(500, 'Erro ao deletar consulta.');
+    } catch (error) {
+        next(error);
     }
 };
 
-module.exports = { getConsultas, createConsulta, updateConsulta, deleteConsulta };
+module.exports = {
+    getConsultas,
+    getConsultaById,
+    createConsulta,
+    updateConsulta,
+    deleteConsulta,
+};

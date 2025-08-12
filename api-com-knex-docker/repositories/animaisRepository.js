@@ -1,37 +1,47 @@
-const { v4: uuidv4 } = require('uuid');
+const db = require('../db/db');
+const { AppError } = require('../utils/errorHandler');
 
-const animais = [];
-
-const findAll = () => animais;
-
-const findById = (id) => animais.find((a) => a.id === id);
-
-const create = (data) => {
-    const novoAnimal = { id: uuidv4(), ...data };
-    animais.push(novoAnimal);
-    return novoAnimal;
-};
-
-const update = (id, data) => {
-    const index = animais.findIndex((a) => a.id === id);
-
-    if (index !== -1) {
-        animais[index] = { ...animais[index], ...data };
-        return animais[index];
+async function findAll() {
+    try {
+        return await db('animais').select('*').orderBy('id', 'asc');
+    } catch (error) {
+        throw new AppError(500, 'Erro ao buscar animais', [error.message]);
     }
+}
 
-    return null;
-};
-
-const remove = (id) => {
-    const index = animais.findIndex((a) => a.id === id);
-
-    if (index !== -1) {
-        animais.splice(index, 1);
-        return true;
+async function findById(id) {
+    try {
+        return await db('animais').where({ id }).first();
+    } catch (error) {
+        throw new AppError(500, 'Erro ao buscar animal', [error.message]);
     }
+}
 
-    return false;
-};
+async function create(data) {
+    try {
+        const [animal] = await db('animais').insert(data).returning('*');
+        return animal;
+    } catch (error) {
+        throw new AppError(500, 'Erro ao criar animal', [error.message]);
+    }
+}
+
+async function update(id, data) {
+    try {
+        const [animal] = await db('animais').update(data).where({ id }).returning('*');
+        return animal || null;
+    } catch (error) {
+        throw new AppError(500, 'Erro ao atualizar animal', [error.message]);
+    }
+}
+
+async function remove(id) {
+    try {
+        const deleted = await db('animais').where({ id }).del();
+        return deleted > 0;
+    } catch (error) {
+        throw new AppError(500, 'Erro ao deletar animal', [error.message]);
+    }
+}
 
 module.exports = { findAll, findById, create, update, remove };

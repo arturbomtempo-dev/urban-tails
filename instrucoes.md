@@ -12,13 +12,11 @@ No terminal, dentro da pasta do seu projeto, execute:
 
 ```bash
 npm install knex pg dotenv
-npm install --save-dev nodemon
 ```
 
 -   `knex`: Query builder para banco SQL
 -   `pg`: Driver PostgreSQL para Node.js
 -   `dotenv`: Para carregar variáveis de ambiente
--   `nodemon`: Para desenvolvimento (opcional, mas recomendado)
 
 ---
 
@@ -40,7 +38,6 @@ NODE_ENV=development
 Na raiz do projeto, crie o arquivo `docker-compose.yml` para subir o banco PostgreSQL:
 
 ```yaml
-version: '1'
 services:
     postgres:
         container_name: postgres-database
@@ -230,7 +227,6 @@ npx knex migrate:latest
 
 ```bash
 npx knex seed:make initial_animais
-npx knex seed:make initial_consultas
 ```
 
 -   Edite os arquivos gerados em `db/seeds` para inserir dados iniciais, por exemplo:
